@@ -22,8 +22,11 @@ static struct {
 } proto_table[] = {
 	AF_UNIX,	"AF_UNIX",	&unix_proto_ops
 };
+
+/* 获取proto_table数组的长度 */
 #define NPROTO (sizeof(proto_table) / sizeof(proto_table[0]))
 
+/* 获取协议名称，如若没有返回‘UNKNOWN’ */
 static char *
 family_name(int family)
 {
@@ -35,6 +38,7 @@ family_name(int family)
 	return "UNKNOWN";
 }
 
+/* sock */
 static int sock_lseek(struct inode *inode, struct file *file, off_t offset,
 		      int whence);
 static int sock_read(struct inode *inode, struct file *file, char *buf,
@@ -49,6 +53,7 @@ static void sock_close(struct inode *inode, struct file *file);
 static int sock_ioctl(struct inode *inode, struct file *file,
 		      unsigned int cmd, unsigned int arg);
 
+/* socket文件操作 */
 static struct file_operations socket_file_ops = {
 	sock_lseek,
 	sock_read,
@@ -77,14 +82,15 @@ get_fd(struct inode *inode)
 
 	/*
 	 * find a file descriptor suitable for return to the user.
+	 * 寻找一个合适的文件描述符返回给用户
 	 */
 	for (fd = 0; fd < NR_OPEN; ++fd)
-		if (!current->filp[fd])
+		if (!current->filp[fd])  // current?
 			break;
 	if (fd == NR_OPEN)
 		return -1;
-	current->close_on_exec &= ~(1 << fd);
-	for (file = file_table, i = 0; i < NR_FILE; ++i, ++file)
+	current->close_on_exec &= ~(1 << fd);   // 把指定位清零
+	for (file = file_table, i = 0; i < NR_FILE; ++i, ++file) // file_table?
 		if (!file->f_count)
 			break;
 	if (i == NR_FILE)
