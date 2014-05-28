@@ -260,11 +260,11 @@ return __res;
 extern inline size_t strlen(const char * s)
 {
 register int __res __asm__("cx");
-__asm__("cld\n\t"
-	"repne\n\t"
-	"scasb\n\t"
-	"notl %0\n\t"
-	"decl %0"
+__asm__("cld\n\t"        //清除方向标志，告诉程序si,di向前移动。std为设置方向标志，告诉si,di向后移动
+	"repne\n\t"      //不等的时候重复，每次将cx减1
+	"scasb\n\t"      //它的含义是[al]-[di]，检查di中是否有al中的字符，每比较一次，di自动变化，向上或向下移动
+	"notl %0\n\t"    //取反
+	"decl %0"        //减1
 	:"=c" (__res):"D" (s),"a" (0),"0" (0xffffffff):"di");
 return __res;
 }
