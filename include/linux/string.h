@@ -21,11 +21,17 @@ extern char * strerror(int errno);
  *		(C) 1991 Linus Torvalds
  */
  
+ /*
+  * lodsb指令：块读出指令，把si指向的存储单元读入累加器，lodsb是读入al，lodsw是读入ax中，然后si自动增加或减小1或2位
+  * 当方向标志位DF=0时，si增加；DF=1时，si减小。
+  * stosb,stosw是块写入指令，是将累加器的内容写入到指向的储存单元中。si自动增加减少1或2位。当DF=0时，自动增加；DF=1
+  * 时，si自动减少。
+ */
 extern inline char * strcpy(char * dest,const char *src)
 {
 __asm__("cld\n"
-	"1:\tlodsb\n\t"
-	"stosb\n\t"
+	"1:\tlodsb\n\t"   // lodsb，块读出指令
+	"stosb\n\t"       // stosb，块写入指令
 	"testb %%al,%%al\n\t"
 	"jne 1b"
 	::"S" (src),"D" (dest):"si","di","ax");
